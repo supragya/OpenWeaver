@@ -53,6 +53,7 @@ add_library(sodium STATIC IMPORTED GLOBAL)
 add_library(sodium::sodium ALIAS sodium)
 add_dependencies(sodium libsodium)
 
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/libsodium/include)
 set_target_properties(sodium PROPERTIES
 	IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/libsodium/lib/libsodium.a
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}/libsodium/include
@@ -72,6 +73,7 @@ add_library(cryptopp STATIC IMPORTED GLOBAL)
 add_library(cryptopp::CryptoPP ALIAS cryptopp)
 add_dependencies(cryptopp libcryptopp)
 
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/cryptopp/include)
 set_target_properties(cryptopp PROPERTIES
 	IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/cryptopp/lib/libcryptopp.a
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}/cryptopp/include
@@ -91,6 +93,7 @@ add_library(secp256k1 STATIC IMPORTED GLOBAL)
 add_library(secp256k1::secp256k1 ALIAS secp256k1)
 add_dependencies(secp256k1 libsecp256k1)
 
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/secp256k1/include)
 set_target_properties(secp256k1 PROPERTIES
 	IMPORTED_LOCATION ${CMAKE_CURRENT_BINARY_DIR}/secp256k1/lib/libsecp256k1.a
 	INTERFACE_INCLUDE_DIRECTORIES ${CMAKE_CURRENT_BINARY_DIR}/secp256k1/include
@@ -104,3 +107,47 @@ add_subdirectory(boost)
 
 #-------- snappy --------#
 add_subdirectory(snappy)
+
+
+#-------- structopt --------#
+add_subdirectory(structopt)
+
+install(TARGETS structopt
+	EXPORT structopt-export
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(EXPORT structopt-export
+	FILE
+		StructoptTargets.cmake
+	NAMESPACE
+		structopt::
+	DESTINATION
+		${CMAKE_INSTALL_LIBDIR}/cmake/structopt
+)
+
+#-------- rapidjson --------#
+
+cmake_policy(SET CMP0077 NEW)
+add_library(rapidjson INTERFACE)
+target_include_directories(rapidjson
+	INTERFACE
+		$<INSTALL_INTERFACE:include>
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/rapidjson/include>
+)
+
+install(TARGETS rapidjson
+	EXPORT rapidjson-export
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+
+install(EXPORT rapidjson-export
+	FILE
+		RapidjsonTargets.cmake
+	NAMESPACE
+		rapidjson::
+	DESTINATION
+		${CMAKE_INSTALL_LIBDIR}/cmake/rapidjson
+)
